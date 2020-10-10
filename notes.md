@@ -10,7 +10,7 @@ Query
 
 Response
 ```
-{
+[
   type: "SPOT",
   results: [
     {
@@ -20,7 +20,7 @@ Response
       score: int
     }
   ]
-}
+]
 ```
 
 ### Querying spot data

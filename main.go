@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/nickbetsworth/mswclient"
+  "github.com/nickbetsworth/mswclient"
 )
 
 func main() {
-	fmt.Println("Hello, World!!")
-	mswclient.GetSpots("testt")
+  var spots mswclient.SpotResults = mswclient.GetSpots("Porthcawl")
+  fmt.Println(spots[0].ID)
 }
