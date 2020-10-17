@@ -56,3 +56,9 @@ This chat command returns an ordered list of matching spot names. The user then 
 
 The user selects the second matched spot:
 > ;s 2
+
+
+## Todo
+- Factor out units into command line argument
+- Resolve time zone issues
+- Allow a user to query for a particular day
