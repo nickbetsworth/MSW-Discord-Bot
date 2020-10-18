@@ -52,7 +52,7 @@ func main() {
   err = discord.Open()
 
   if err != nil {
-    log.Fatal("Error opening discord session: ", err)
+    log.Fatal("Error opening discord session: ", err, token)
   }
 
   fmt.Println("MSW forecast bot is now running. press Ctrl-C to exit.")
