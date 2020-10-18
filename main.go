@@ -5,16 +5,22 @@ import (
 	"flag"
   "fmt"
   "os"
+  "log"
   "os/signal"
   "syscall"
   "time"
   "github.com/bwmarrin/discordgo"
+  "github.com/joho/godotenv"
   "github.com/nickbetsworth/mswclient"
 )
 
 func init() {
-  flag.StringVar(&token, "t", "", "Bot Token")
-  flag.Parse()
+  err := godotenv.Load()
+  if err != nil {
+    log.Fatal("Error loading .env file")
+  }
+
+  token = os.Getenv("DISCORD_BOT_KEY")
 }
 
 var token string
