@@ -20,9 +20,12 @@ func init() {
 var token string
 
 var emojiIds = map[string]string{
-  ":SolidStar:": "764443959409770496",
-  ":FadedStar:": "764443958993485855",
-  ":NoStar:": "764443959157194773",
+  ":S0F0N2:": "767332050079449108",
+  ":S0F1N1:": "767332050126110720",
+  ":S0F2N0:": "767332049866063883",
+  ":S1F0N1:": "767332050079580200",
+  ":S1F1N0:": "767332050125455420",
+  ":S2F0N0:": "767332049816125474",
 }
 
 func main() {
@@ -138,7 +141,7 @@ func convertForecastPeriodToString(f mswclient.ForecastResult) string {
 
   formattedHour := time.Format("3pm")
   return fmt.Sprintf(
-    "%s %d-%d%s %s%.1f%s %ds | %d%s %s\n",
+    "%s %d-%d%s %s %.1f%s %ds | %d%s %s\n",
     formattedHour,
     f.Swell.MinBreakingHeight, 
     f.Swell.MaxBreakingHeight, 
@@ -174,24 +177,38 @@ func groupForecastsByDay(ungroupedForecasts mswclient.ForecastResults) []dayFore
 }
 
 func getStarRatingString(f mswclient.ForecastResult) string {
-  var output string
+  return getStarRating(int(f.SolidRating), int(f.FadedRating), int(6 - f.SolidRating - f.FadedRating))
+}
 
-  for i := 0; i < int(f.SolidRating); i++ {
-    output += getEmoji(":SolidStar:")
+func getStarRating(solidRating int, fadedRating int, noRating int) string {
+  if solidRating + fadedRating + noRating == 0 {
+    return ""
   }
-  for i := 0; i < int(f.FadedRating); i++ {
-    output += getEmoji(":FadedStar:")
-  }
-  // Todo: add emojis for 1-6 of each star to reduce text length
-  // for i := 0; i < 6 - int(f.SolidRating + f.FadedRating); i++ {
-  //   output += getEmoji(":NoStar:")
-  // }
 
-  return output
+  numSolid, numFaded, numBlank := 0, 0, 0
+  if solidRating > 0 {
+    numSolid = min(2, solidRating)
+  }
+  if fadedRating > 0 {
+    numFaded = min((2-numSolid), fadedRating)
+  }
+  if noRating > 0 {
+    numBlank = min((2-numSolid-numFaded), noRating)
+  }
+
+  return getEmoji(fmt.Sprintf(":S%dF%dN%d:", numSolid, numFaded, numBlank)) + getStarRating(solidRating-numSolid, fadedRating-numFaded, noRating-numBlank)
 }
 
 func getEmoji(emoji string) string {
   return fmt.Sprintf("<%s%s>", emoji, emojiIds[emoji])
+}
+
+func min(a int, b int) int {
+  if a < b {
+    return a
+  }
+
+  return b
 }
 
 type dayForecast struct {
