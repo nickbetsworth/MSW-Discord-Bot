@@ -2,7 +2,6 @@ package main
 
 import (
 	"strings"
-	"flag"
   "fmt"
   "os"
   "log"
@@ -36,14 +35,14 @@ var emojiIds = map[string]string{
 
 func main() {
   if token == "" {
-    fmt.Println("No token was provided. Please run: mswdiscordbot -t <bot token>")
+    log.Fatal("No token was provided. Please set the token in your .env file")
     return
   }
 
   discord, err := discordgo.New("Bot " + token)
 
   if err != nil {
-    fmt.Println("Error initialising discord session: ", err)
+    log.Fatal("Error initialising discord session: ", err)
   }
   
   discordgo.MakeIntent(discordgo.IntentsGuilds | discordgo.IntentsGuildMessages)
@@ -53,7 +52,7 @@ func main() {
   err = discord.Open()
 
   if err != nil {
-    fmt.Println("Error opening discord session: ", err)
+    log.Fatal("Error opening discord session: ", err)
   }
 
   fmt.Println("MSW forecast bot is now running. press Ctrl-C to exit.")
@@ -91,7 +90,7 @@ func messageCreate(s *discordgo.Session, event *discordgo.MessageCreate) {
       tides := mswclient.GetTides(spot.ID, dayForecast.ForecastStartTimestamp, dayForecast.ForecastStartTimestamp)
 
       if len(tides) > 1 || len(tides) == 0 {
-        fmt.Printf("Unexpected number of tide results (%d) for spot %d", len(tides), spot.ID)
+        log.Printf("Unexpected number of tide results (%d) for spot %d\n", len(tides), spot.ID)
         continue
       }
 
