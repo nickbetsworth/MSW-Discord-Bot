@@ -64,24 +64,20 @@ func messageCreate(s *discordgo.Session, event *discordgo.MessageCreate) {
       return
     }
     searchString := strings.TrimSpace(strings.TrimPrefix(event.Content, "!msw"))
-    s.ChannelMessageSend(event.ChannelID, "Searching for surf spots at " + searchString)
+    s.ChannelMessageSend(event.ChannelID, fmt.Sprintf("Searching for surf spots at \"%s\"", searchString))
     
     // Todo: add support for direct querying by spot ID
 
     spots := mswclient.GetSpots(searchString)
     
     if len(spots) == 0 {
-      s.ChannelMessageSend(event.ChannelID, "No spots found matching \"" + searchString + "\"")
+      s.ChannelMessageSend(event.ChannelID, fmt.Sprintf("No spots found matching \"%s\"", searchString))
       return
     }
 
-    // Todo: remove output of spot list
-    // Todo: if there are multiple spots, send the user a message notifying them to be more specific
-    for _, spot := range spots {
-      s.ChannelMessageSend(event.ChannelID, spot.Name)
-    }
-
     spot := spots[0]
+    s.ChannelMessageSend(event.ChannelID, "Showing forecast for " + spot.Name)
+
     forecast := mswclient.GetForecast(spot.ID)
 
     groupedForecasts := groupForecastsByDay(forecast)
@@ -146,7 +142,7 @@ func convertForecastPeriodToString(f mswclient.ForecastResult) string {
     f.Swell.MinBreakingHeight, 
     f.Swell.MaxBreakingHeight, 
     f.Swell.Unit, 
-    getStarRatingString(f), 
+    getStarRatingString(int(f.SolidRating), int(f.FadedRating), int(6 - f.SolidRating - f.FadedRating)), 
     f.Swell.Height, 
     f.Swell.Unit, 
     f.Swell.Period,
@@ -176,11 +172,7 @@ func groupForecastsByDay(ungroupedForecasts mswclient.ForecastResults) []dayFore
   return groupedForecasts
 }
 
-func getStarRatingString(f mswclient.ForecastResult) string {
-  return getStarRating(int(f.SolidRating), int(f.FadedRating), int(6 - f.SolidRating - f.FadedRating))
-}
-
-func getStarRating(solidRating int, fadedRating int, noRating int) string {
+func getStarRatingString(solidRating int, fadedRating int, noRating int) string {
   if solidRating + fadedRating + noRating == 0 {
     return ""
   }
@@ -196,7 +188,7 @@ func getStarRating(solidRating int, fadedRating int, noRating int) string {
     numBlank = min((2-numSolid-numFaded), noRating)
   }
 
-  return getEmoji(fmt.Sprintf(":S%dF%dN%d:", numSolid, numFaded, numBlank)) + getStarRating(solidRating-numSolid, fadedRating-numFaded, noRating-numBlank)
+  return getEmoji(fmt.Sprintf(":S%dF%dN%d:", numSolid, numFaded, numBlank)) + getStarRatingString(solidRating-numSolid, fadedRating-numFaded, noRating-numBlank)
 }
 
 func getEmoji(emoji string) string {
