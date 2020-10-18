@@ -77,7 +77,6 @@ func messageCreate(s *discordgo.Session, event *discordgo.MessageCreate) {
 
     spot := spots[0]
     s.ChannelMessageSend(event.ChannelID, "Showing forecast for " + spot.Name)
-
     forecast := mswclient.GetForecast(spot.ID)
 
     groupedForecasts := groupForecastsByDay(forecast)
@@ -123,7 +122,7 @@ func convertTideToMessage(tides mswclient.TideResult) discordgo.MessageEmbedFiel
   var tideStrings []string
 
   for _, t := range tides.Tide {
-    tm := time.Unix(t.Timestamp, 0)
+    tm := time.Unix(t.Unixtime, 0)
     tideStrings = append(tideStrings, fmt.Sprintf("%s %s", t.State, tm.Format("3:04pm")))
   }
 
