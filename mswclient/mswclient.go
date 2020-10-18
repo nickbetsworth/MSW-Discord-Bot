@@ -8,7 +8,7 @@ import (
   "fmt"
 )
 
-const mswAPIEndpoint string = "https://magicseaweed.com/api/mdkey"
+const mswAPIEndpoint string = "http://magicseaweed.com/api/mdkey"
 
 // GetSpots returns a list of spots matching the given query string
 func GetSpots(query string) SpotResults {
