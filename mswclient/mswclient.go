@@ -113,6 +113,7 @@ type ForecastResult struct {
     StringDirection   string  `json:"stringDirection"`
   }
   LocalTimestamp int64 `json:"localTimestamp"`
+  Timestamp int64 `json:"timestamp"`
 }
 
 type ForecastResults []struct {

@@ -97,7 +97,7 @@ func messageCreate(s *discordgo.Session, event *discordgo.MessageCreate) {
       tideMessage := convertTideToMessage(tides[0].TideResult)
       forecastMessage := convertDayForecastToMessage(dayForecast)
 
-      startOfDay := time.Unix(dayForecast.ForecastStartTimestamp, 0)
+      startOfDay := time.Unix(dayForecast.ForecastStartLocalTimestamp, 0)
 
       _, err := s.ChannelMessageSendEmbed(event.ChannelID, &discordgo.MessageEmbed{
         Title: startOfDay.Format("Monday 02/01"),
@@ -165,7 +165,7 @@ func groupForecastsByDay(ungroupedForecasts mswclient.ForecastResults) []dayFore
     tm := time.Unix(forecastPeriod.LocalTimestamp, 0)
 
     if tm.Day() != currentDay {
-      groupedForecasts = append(groupedForecasts, dayForecast{ForecastStartTimestamp: forecastPeriod.LocalTimestamp})
+      groupedForecasts = append(groupedForecasts, dayForecast{ForecastStartTimestamp: forecastPeriod.Timestamp, ForecastStartLocalTimestamp: forecastPeriod.LocalTimestamp})
       currentDay = tm.Day()
     }
 
@@ -209,5 +209,6 @@ func min(a int, b int) int {
 
 type dayForecast struct {
   ForecastStartTimestamp int64
+  ForecastStartLocalTimestamp int64
   ForecastPeriods []mswclient.ForecastResult
 }
