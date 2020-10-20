@@ -137,7 +137,7 @@ func convertTideToMessage(tides mswclient.TideResult) discordgo.MessageEmbedFiel
 }
 
 func convertForecastPeriodToString(f mswclient.ForecastResult) string {
-  time := time.Unix(f.Timestamp, 0)
+  time := time.Unix(f.LocalTimestamp, 0)
 
   formattedHour := time.Format("3pm")
   return fmt.Sprintf(
@@ -162,10 +162,10 @@ func groupForecastsByDay(ungroupedForecasts mswclient.ForecastResults) []dayFore
   currentDay := -1
 
   for _, forecastPeriod := range ungroupedForecasts {
-    tm := time.Unix(forecastPeriod.Timestamp, 0)
+    tm := time.Unix(forecastPeriod.LocalTimestamp, 0)
 
     if tm.Day() != currentDay {
-      groupedForecasts = append(groupedForecasts, dayForecast{ForecastStartTimestamp: forecastPeriod.Timestamp})
+      groupedForecasts = append(groupedForecasts, dayForecast{ForecastStartTimestamp: forecastPeriod.LocalTimestamp})
       currentDay = tm.Day()
     }
 
