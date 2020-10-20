@@ -45,7 +45,7 @@ func GetTides(spotId int64, start int64, end int64) TideResults {
 }
 
 func GetForecast(spotId int64) ForecastResults {
-  var endpoint = getAPIURL(fmt.Sprintf("forecast/?spot_id=%d&fields=solidRating,fadedRating,swell.*,wind.*,timestamp&units=uk", spotId))
+  var endpoint = getAPIURL(fmt.Sprintf("forecast/?spot_id=%d&fields=solidRating,fadedRating,swell.*,wind.*,timestamp,localTimestamp,threeHourTimeText&units=uk", spotId))
   response, err := http.Get(endpoint)
 
   if err != nil {
@@ -112,6 +112,7 @@ type ForecastResult struct {
     Unit              string  `json:"unit"`
     StringDirection   string  `json:"stringDirection"`
   }
+  ThreeHourTimeText string `json:"threeHourTimeText"`
   LocalTimestamp int64 `json:"localTimestamp"`
   Timestamp int64 `json:"timestamp"`
 }

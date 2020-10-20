@@ -105,7 +105,7 @@ func messageCreate(s *discordgo.Session, event *discordgo.MessageCreate) {
       })
 
       if (err != nil) {
-        fmt.Println(err)
+        log.Println(err)
       }
     }
 }
@@ -137,12 +137,9 @@ func convertTideToMessage(tides mswclient.TideResult) discordgo.MessageEmbedFiel
 }
 
 func convertForecastPeriodToString(f mswclient.ForecastResult) string {
-  time := time.Unix(f.LocalTimestamp, 0)
-
-  formattedHour := time.Format("3pm")
   return fmt.Sprintf(
     "%s %d-%d%s %s %.1f%s %ds | %d%s %s\n",
-    formattedHour,
+    f.ThreeHourTimeText,
     f.Swell.MinBreakingHeight, 
     f.Swell.MaxBreakingHeight, 
     f.Swell.Unit, 
@@ -159,14 +156,9 @@ func convertForecastPeriodToString(f mswclient.ForecastResult) string {
 func groupForecastsByDay(ungroupedForecasts mswclient.ForecastResults) []dayForecast {
   var groupedForecasts []dayForecast
   
-  currentDay := -1
-
   for _, forecastPeriod := range ungroupedForecasts {
-    tm := time.Unix(forecastPeriod.LocalTimestamp, 0)
-
-    if tm.Day() != currentDay {
+    if forecastPeriod.ThreeHourTimeText == "12am" || len(groupedForecasts) == 0 {
       groupedForecasts = append(groupedForecasts, dayForecast{ForecastStartTimestamp: forecastPeriod.Timestamp, ForecastStartLocalTimestamp: forecastPeriod.LocalTimestamp})
-      currentDay = tm.Day()
     }
 
     currentDayForecast := &groupedForecasts[len(groupedForecasts)-1]
