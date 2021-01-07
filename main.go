@@ -69,6 +69,12 @@ func messageCreate(s *discordgo.Session, event *discordgo.MessageCreate) {
       return
     }
     searchString := strings.TrimSpace(strings.TrimPrefix(event.Content, "!msw"))
+
+    if len(searchString) == 0 {
+      s.ChannelMessageSend(event.ChannelID, "Please enter a search string i.e `!msw spot name`")
+      return
+    }
+
     s.ChannelMessageSend(event.ChannelID, fmt.Sprintf("Searching for surf spots at \"%s\"", searchString))
     
     // Todo: add support for direct querying by spot ID
@@ -89,12 +95,7 @@ func messageCreate(s *discordgo.Session, event *discordgo.MessageCreate) {
     for _, dayForecast := range groupedForecasts {
       tides := mswclient.GetTides(spot.ID, dayForecast.ForecastStartTimestamp, dayForecast.ForecastStartTimestamp)
 
-      if len(tides) > 1 || len(tides) == 0 {
-        log.Printf("Unexpected number of tide results (%d) for spot %d\n", len(tides), spot.ID)
-        continue
-      }
-
-      tideMessage := convertTideToMessage(tides[0].TideResult)
+      tideMessage := convertTideToMessage(tides)
       forecastMessage := convertDayForecastToMessage(dayForecast)
 
       startOfDay := time.Unix(dayForecast.ForecastStartLocalTimestamp, 0)
@@ -120,13 +121,19 @@ func convertDayForecastToMessage(forecast dayForecast) discordgo.MessageEmbedFie
   return result;
 }
 
-func convertTideToMessage(tides mswclient.TideResult) discordgo.MessageEmbedField {
+func convertTideToMessage(tides mswclient.TideResults) discordgo.MessageEmbedField {
   var result discordgo.MessageEmbedField
   result.Name = "Tides"
 
+  if len(tides) > 1 || len(tides) == 0 {
+    log.Printf("Unexpected number of tide results (%d)\n", len(tides))
+    result.Value = "Unable to retrieve tide data"
+    return result
+  }
+
   var tideStrings []string
 
-  for _, t := range tides.Tide {
+  for _, t := range tides[0].TideResult.Tide {
     tm := time.Unix(t.Unixtime, 0)
     tideStrings = append(tideStrings, fmt.Sprintf("%s %s", t.State, tm.Format("3:04pm")))
   }
